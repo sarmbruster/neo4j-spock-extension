@@ -16,6 +16,7 @@
 
 package org.neo4j.extension.spock
 
+import org.neo4j.cypher.javacompat.ExecutionEngine
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.server.NeoServer
 import org.neo4j.server.helpers.CommunityServerBuilder
@@ -33,6 +34,7 @@ abstract class NeoServerSpecification extends Specification {
     @Shared thirdPartyJaxRsPackages = [:]
 //    @Shared Client client = Client.create()
     @Shared String baseUrl
+    @Shared ExecutionEngine
 
     def setupSpec() {
         def serverBuilder = CommunityServerBuilder.server()
@@ -45,6 +47,9 @@ abstract class NeoServerSpecification extends Specification {
         server.start()
         baseUrl = server.baseUri().toASCIIString()
         graphDatabaseService = server.database.graph
+        executionEngine = new ExecutionEngine(graphDatabaseService)
+        CypherMixin.executionEngine = executionEngine
+        String.mixin CypherMixin
     }
 
 

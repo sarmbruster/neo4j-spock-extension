@@ -45,4 +45,12 @@ class NeoServerSpecificationSpec extends NeoServerSpecification {
         response.content().data[0][0] == 1
 
     }
+
+    def "cyphermixin on String is working"() {
+        when:
+        def result = "match (n) return count(n) as count".cypher()
+
+        then:
+        result[0].count == 1
+    }
 }
