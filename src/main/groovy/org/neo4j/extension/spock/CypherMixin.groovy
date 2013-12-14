@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.neo4j.extension.spock
 
 import org.neo4j.cypher.javacompat.ExecutionEngine
 
+/**
+ * simple mixin class to e.g. enable a cypher method on a String
+ */
 class CypherMixin {
 
     static ExecutionEngine executionEngine
@@ -27,11 +27,5 @@ class CypherMixin {
     def cypher(Map params=[:]) {
         executionEngine.execute(this.toString(), params)
     }
-
-/*
-    def cypher(String cypher) {
-        executionEngine.execute(cypher)
-    }
-*/
 
 }

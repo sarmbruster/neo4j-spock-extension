@@ -16,9 +16,16 @@
 
 package org.neo4j.extension.spock
 
+import org.neo4j.kernel.guard.Guard
 import org.neo4j.test.server.HTTP
 
 class NeoServerSpecificationSpec extends NeoServerSpecification {
+
+    def getConfig() {
+        [
+                execution_guard_enabled: "true"
+        ]
+    }
 
     def "server is running"() {
         expect:
@@ -26,7 +33,7 @@ class NeoServerSpecificationSpec extends NeoServerSpecification {
         HTTP.GET(baseUrl).status() == 200
     }
 
-    def "cypher endpoint is working"() {
+    def "standard cypher endpoint is working"() {
         setup:
         withTransaction {
             graphDatabaseService.createNode()
@@ -46,11 +53,50 @@ class NeoServerSpecificationSpec extends NeoServerSpecification {
 
     }
 
+    def "transactional cypher endpoint is working"() {
+
+        setup:
+        withTransaction {
+            graphDatabaseService.createNode()
+        }
+
+        when:
+        def json = [
+                statements: [
+                    [
+                            statement: "match (n) return count(n)",
+                            parameters: [:]
+                    ]
+                ]
+        ]
+
+        def response = HTTP.POST("${baseUrl}db/data/transaction", json)
+
+        then:
+        response.status() == 201
+        response.content().commit =~ "http://localhost:\\d+/db/data/transaction/1/commit"
+        response.content().results.size() == 1
+        response.content().results[0].columns[0] == "count(n)"
+        response.content().results[0].data.size() == 1
+        response.content().results[0].data.row[0][0] == 2
+
+    }
+
     def "cyphermixin on String is working"() {
         when:
         def result = "match (n) return count(n) as count".cypher()
 
         then:
-        result[0].count == 1
+        result[0].count instanceof Number
     }
+
+
+    def "guard is enabled in this specification"() {
+        when:
+        server.database.graph.dependencyResolver.resolveDependency(Guard)
+
+        then:
+        notThrown IllegalArgumentException
+    }
+
 }

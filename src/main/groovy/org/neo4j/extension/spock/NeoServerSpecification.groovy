@@ -19,7 +19,6 @@ package org.neo4j.extension.spock
 import org.neo4j.cypher.javacompat.ExecutionEngine
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.server.NeoServer
-import org.neo4j.server.helpers.CommunityServerBuilder
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -30,17 +29,23 @@ abstract class NeoServerSpecification extends Specification {
 
     @Shared GraphDatabaseService graphDatabaseService
     @Shared NeoServer server
-    @Shared int port = 37474
+    @Shared int port
     @Shared thirdPartyJaxRsPackages = [:]
+    @Shared config = [:]
 //    @Shared Client client = Client.create()
     @Shared String baseUrl
     @Shared ExecutionEngine
 
     def setupSpec() {
-        def serverBuilder = CommunityServerBuilder.server()
+
+        port = findFreePort()
+        def serverBuilder = new ConfigurableServerBuilder()
 
         thirdPartyJaxRsPackages.each { packageName, mountPoint ->
             serverBuilder.withThirdPartyJaxRsPackage(packageName, mountPoint)
+        }
+        config.each {k,v ->
+            serverBuilder.withConfigProperty(k, v)
         }
 
         server = serverBuilder.onPort(port).build();
@@ -52,6 +57,12 @@ abstract class NeoServerSpecification extends Specification {
         String.mixin CypherMixin
     }
 
+    int findFreePort() {
+        ServerSocket server = new ServerSocket(0)
+        int port = server.localPort
+        server.close()
+        port
+    }
 
     def cleanupSpec() {
         server.stop()
@@ -61,7 +72,6 @@ abstract class NeoServerSpecification extends Specification {
         def tx = graphDatabaseService.beginTx()
         try {
             def result = closure.call()
-
             tx.success()
             return result
         } finally {
