@@ -53,8 +53,8 @@ abstract class NeoServerSpecification extends Specification {
         baseUrl = server.baseUri().toASCIIString()
         graphDatabaseService = server.database.graph
         executionEngine = new ExecutionEngine(graphDatabaseService)
-        CypherMixin.executionEngine = executionEngine
-        String.mixin CypherMixin
+        String.metaClass.cypher = { -> executionEngine.execute(delegate)}
+        String.metaClass.cypher = { Map params -> executionEngine.execute(delegate, params)}
     }
 
     int findFreePort() {

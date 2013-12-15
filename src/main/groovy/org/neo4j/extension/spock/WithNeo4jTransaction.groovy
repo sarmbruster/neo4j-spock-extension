@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.neo4j.extension.spock
 
-import org.neo4j.cypher.javacompat.ExecutionEngine
+import org.spockframework.runtime.extension.ExtensionAnnotation
 
-/**
- * simple mixin class to e.g. enable a cypher method on a String
- */
-class CypherMixin {
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 
-    static ExecutionEngine executionEngine
-
-    def cypher(Map params=[:]) {
-        executionEngine.execute(this.toString(), params)
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target([ElementType.TYPE, ElementType.METHOD])
+@ExtensionAnnotation(Neo4jTransactionExtension.class)
+public @interface WithNeo4jTransaction {
 
 }
