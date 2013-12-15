@@ -50,7 +50,7 @@ publishing {
     repositories {
         maven {
 //            url "file://$buildDir/repo" // change to point to your repo, e.g. http://my.org/repo
-            url 'file:///home/stefan/lib/neo4j/m2/snapshots'  // TODO: externalize this
+            url '../m2/releases'  // TODO: externalize this
         }
     }
 }
