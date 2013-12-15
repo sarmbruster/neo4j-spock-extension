@@ -23,27 +23,28 @@ import org.neo4j.tooling.GlobalGraphOperations
 import org.neo4j.graphdb.Node
 import spock.lang.Specification
 
-class SampleNeo4jSpecification extends Specification {
+class SampleNeo4jSpec extends Specification {
 
     /**
      * provide Neo4j stuff: graphDatabaseService and executionEngine
      */
     @Rule
+    @Delegate
     Neo4jResource neo4jResource = new Neo4jResource( config: [execution_guard_enabled: "true"])
 
     def "graphDatabaseService is available"() {
         expect:
-        neo4jResource.graphDatabaseService != null
+        graphDatabaseService != null  // N.B. due to @Delegate, we're accessing neo4jResource.graphDatabaseService
     }
 
     def "executionEngine is available"() {
         expect:
-        neo4jResource.executionEngine != null
+        executionEngine != null
     }
 
     def "by default a feature method has no transactional context"() {
         when: "trigger a write operation"
-        neo4jResource.graphDatabaseService.createNode()
+        graphDatabaseService.createNode()
 
         then:
         thrown(NotInTransactionException)
@@ -53,14 +54,14 @@ class SampleNeo4jSpecification extends Specification {
     def "withNeo4jTransaction provides transactional"() {
 
         expect: "empty database"
-        IteratorUtil.count(GlobalGraphOperations.at(neo4jResource.graphDatabaseService).allNodes) == 0
+        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 0
 
         when:
-        neo4jResource.graphDatabaseService.createNode()
+        graphDatabaseService.createNode()
 
         then:
         notThrown NotInTransactionException
-        IteratorUtil.count(GlobalGraphOperations.at(neo4jResource.graphDatabaseService).allNodes) == 1
+        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
     }
 
     def "cypher method applied to String class"() {
