@@ -13,13 +13,34 @@ This project uses travis CI, current status: [![Build Status](https://secure.tra
 ## usage ##
 
 Depending on your project's used build system, use one of the alternatives below.
+
+In case of Gradle, embed into your project's `build.gradle` the following repository and dependency:
 
-In case of Gradle, embed into your project's `build.gradle` the following dependency:
-
-    testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: '0.1'
+    repositories {
+        mavenCentral()
+        maven {url "https://raw.github.com/neo4j-contrib/m2/master/releases" }
+    }
+    ....
+    dependencies {
+        ....
+        testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: '0.1'
+    }
     
 If Maven is used:
 
+     <repositories>
+        <repository>
+            <id>neo4j-contrib-releases</id>
+            <url>https://raw.github.com/neo4j-contrib/m2/master/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    ....
     <dependency>
         <groupId>org.neo4j.contrib</groupId>
         <artifactId>neo4j-spock-extension</artifactId>
