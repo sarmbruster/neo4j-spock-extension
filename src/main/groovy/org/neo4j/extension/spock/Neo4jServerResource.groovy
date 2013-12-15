@@ -4,6 +4,7 @@ import org.junit.rules.ExternalResource
 import org.neo4j.cypher.javacompat.ExecutionEngine
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.server.NeoServer
+import org.neo4j.test.server.HTTP
 
 /**
  * abstract base class for spock tests using a Neo4j server
@@ -53,6 +54,10 @@ class Neo4jServerResource extends ExternalResource {
 
     def withTransaction(Closure closure) {
         Neo4jUtils.withSuccessTransaction(graphDatabaseService, closure)
+    }
+
+    def getHttp() {
+        HTTP.withBaseUri(baseUrl)
     }
 
 }

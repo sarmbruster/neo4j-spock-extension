@@ -28,7 +28,9 @@ class SampleNeo4jServerSpec extends Specification {
     def "server is running"() {
         expect:
         neo4j.baseUrl == "http://localhost:${neo4j.port}/"
-        HTTP.GET(neo4j.baseUrl).status() == 200
+
+        and: "root page gives http 200"
+        neo4j.http.GET("").status() == 200
     }
 
     def "standard cypher endpoint is working"() {
@@ -40,7 +42,7 @@ class SampleNeo4jServerSpec extends Specification {
                 query: "match (n) return count(n)"
         ]
 
-        def response = HTTP.POST("${neo4j.baseUrl}db/data/cypher", json)
+        def response = neo4j.http.POST("db/data/cypher", json)
 
         then:
         response.status() == 200
@@ -62,7 +64,7 @@ class SampleNeo4jServerSpec extends Specification {
                     ]
                 ]
         ]
-        def response = HTTP.POST("${neo4j.baseUrl}db/data/transaction", json)
+        def response = neo4j.http.POST("db/data/transaction", json)
 
         then:
         response.status() == 201
