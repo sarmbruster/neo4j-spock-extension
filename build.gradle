@@ -16,9 +16,6 @@ ext {
     jerseyVersion = "1.9"
 }
 
-version = "0.1"
-group="org.neo4j.extension.neo4j-spock-helper"
-  
 dependencies {
     compile group: "org.codehaus.groovy", name: "groovy-all", version: "2.2.1"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion
@@ -40,10 +37,13 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.9'
 }
 
-/*
- publishing {
+publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
+            groupId 'org.neo4j.contrib'
+            artifactId 'neo4j-spock-extension'
+            version '0.1'
+
             from components.java
         }
     }
@@ -54,4 +54,4 @@ task wrapper(type: Wrapper) {
         }
     }
 }
-*/
+
