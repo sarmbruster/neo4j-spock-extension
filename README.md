@@ -9,7 +9,7 @@ provide a convenience jar file to be used for testing [Neo4j](http://www.neo4j.o
 GPL v3
 
 ## build & install ##
-neo4j-spock-extension uses [Gradle](http://www.gradle.org) as build system.
+neo4j-spock-extension uses [Gradle](http://www.gradle.org) as build system. To build on your own, use `./gradlew test assemble`.
 
 ### features ###
 * for unit tests, derive from NeoSpecification instead of spock.lang.Specification
