@@ -1,4 +1,6 @@
-# neo4j-spock-helper #
+[![Build Status](https://secure.travis-ci.org/sarmbruster/neo4j-spock-extension.png)](http://travis-ci.org/sarmbruster/neo4j-spock-extension)
+
+# neo4j-spock-extension #
 
 ## purpose ##
 provide a convenience jar file to be used for testing [Neo4j](http://www.neo4j.org) applications using [Spock](http://www.spockframework.org).
@@ -7,7 +9,7 @@ provide a convenience jar file to be used for testing [Neo4j](http://www.neo4j.o
 GPL v3
 
 ## build & install ##
-neo4j-spock-helper uses [Gradle](http://www.gradle.org) as build system.
+neo4j-spock-extension uses [Gradle](http://www.gradle.org) as build system.
 
 ### features ###
 * for unit tests, derive from NeoSpecification instead of spock.lang.Specification
