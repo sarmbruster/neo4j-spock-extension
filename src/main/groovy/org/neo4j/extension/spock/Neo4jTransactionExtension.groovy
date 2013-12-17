@@ -16,7 +16,7 @@ class Neo4jTransactionExtension extends AbstractAnnotationDrivenExtension<WithNe
         feature.featureMethod.addInterceptor(new AbstractMethodInterceptor() {
             @Override
             void interceptFeatureMethod(IMethodInvocation invocation) throws Throwable {
-                Neo4jResource value = invocation.instance.properties.values().find { it instanceof Neo4jResource}
+                GraphDatabaseServiceProvider value = invocation.instance.properties.values().find { it instanceof GraphDatabaseServiceProvider}
                 assert value, "no Neo4jResource defined in specification ${invocation.instance.class.name}"
                 Neo4jUtils.withSuccessTransaction(value.graphDatabaseService, { invocation.proceed() } )
             }

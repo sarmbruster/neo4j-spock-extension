@@ -9,7 +9,7 @@ import org.neo4j.test.server.HTTP
 /**
  * abstract base class for spock tests using a Neo4j server
  */
-class Neo4jServerResource extends ExternalResource {
+class Neo4jServerResource extends ExternalResource implements GraphDatabaseServiceProvider {
 
     GraphDatabaseService graphDatabaseService
     NeoServer server

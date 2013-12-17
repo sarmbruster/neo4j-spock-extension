@@ -1,6 +1,7 @@
 package org.neo4j.extension.spock
 
 import org.junit.ClassRule
+import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.Iterables
 import org.neo4j.kernel.guard.Guard
 import org.neo4j.test.server.HTTP
@@ -91,6 +92,25 @@ class SampleNeo4jServerSpec extends Specification {
 
         then:
         notThrown IllegalArgumentException
+    }
+
+
+    def "there is no transactional scope by default"() {
+        when:
+        neo4j.graphDatabaseService.createNode()
+
+        then:
+        thrown NotInTransactionException
+    }
+
+
+    @WithNeo4jTransaction
+    def "withNeo4jTransaction provides transactional scope"() {
+        when:
+        neo4j.graphDatabaseService.createNode()
+
+        then:
+        notThrown NotInTransactionException
     }
 
     private def getNodeCount() {

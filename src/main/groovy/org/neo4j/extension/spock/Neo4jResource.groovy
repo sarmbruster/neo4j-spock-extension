@@ -9,7 +9,7 @@ import org.neo4j.test.TestGraphDatabaseFactory
  * a junit external resource implementation for providing a {@link GraphDatabaseService} and a {@link ExecutionEngine}.
  * Additionally a cypher method is activated on Strings
  */
-class Neo4jResource extends ExternalResource {
+class Neo4jResource extends ExternalResource implements GraphDatabaseServiceProvider {
 
     Map config = [:]
     GraphDatabaseService graphDatabaseService
