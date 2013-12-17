@@ -60,4 +60,28 @@ class Neo4jServerResource extends ExternalResource implements GraphDatabaseServi
         HTTP.withBaseUri(baseUrl)
     }
 
+    def postLegacyCypher(json) {
+        http.POST("db/data/cypher", json)
+    }
+
+    def postTransactionalCypher(statements, params=null) {
+        http.POST("db/data/transaction/commit", createJsonForTransactionalEndpoint(statements, params))
+    }
+
+    /**
+     * create a collection structure fitting being suitable for json format used for
+     * transactional endpoint
+     * @param statements array holding cypher statements
+     * @param params array holding parameter for statements
+     * @return
+     */
+    def createJsonForTransactionalEndpoint(statements, params) {
+        if (!params) {
+            params = statements.collect { [:] }
+        }
+        def transposed = [statements, params].transpose()
+        [
+                statements: transposed.collect { [statement: it[0], parameters: it[1]] }
+        ]
+    }
 }

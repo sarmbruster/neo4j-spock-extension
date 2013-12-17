@@ -4,7 +4,6 @@ import org.junit.ClassRule
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.Iterables
 import org.neo4j.kernel.guard.Guard
-import org.neo4j.test.server.HTTP
 import org.neo4j.tooling.GlobalGraphOperations
 import spock.lang.Shared
 import spock.lang.Specification
@@ -39,17 +38,12 @@ class SampleNeo4jServerSpec extends Specification {
         def nodeCount = getNodeCount()
 
         when:
-        def json = [
-                query: "match (n) return count(n)"
-        ]
-
-        def response = neo4j.http.POST("db/data/cypher", json)
+        def response = neo4j.postLegacyCypher([query: "match (n) return count(n)"])
 
         then:
         response.status() == 200
         response.content().data.size() == 1
         response.content().data[0][0] == nodeCount
-
     }
 
     def "transactional cypher endpoint is working"() {
@@ -57,24 +51,14 @@ class SampleNeo4jServerSpec extends Specification {
         def nodeCount = getNodeCount()
 
         when:
-        def json = [
-                statements: [
-                    [
-                            statement: "match (n) return count(n)",
-                            parameters: [:]
-                    ]
-                ]
-        ]
-        def response = neo4j.http.POST("db/data/transaction", json)
+        def response = neo4j.postTransactionalCypher(["match (n) return count(n)"])
 
         then:
-        response.status() == 201
-        response.content().commit =~ "http://localhost:\\d+/db/data/transaction/1/commit"
+        response.status() == 200
         response.content().results.size() == 1
         response.content().results[0].columns[0] == "count(n)"
         response.content().results[0].data.size() == 1
         response.content().results[0].data.row[0][0] == nodeCount
-
     }
 
     def "cypher method on String is working"() {
