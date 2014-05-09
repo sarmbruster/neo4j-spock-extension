@@ -8,11 +8,11 @@ apply from: 'gradle/idea/idea.gradle'
 
 repositories {
     mavenCentral()
-    //maven { url "http://m2.neo4j.org/content/repositories/releases/" }
+    maven { url "http://m2.neo4j.org/content/repositories/releases/" }
 }
 
 ext {
-    neo4jVersion = "2.0.0"
+    neo4jVersion = "2.0.3"
     jerseyVersion = "1.9"
 }
 
@@ -42,7 +42,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.2'
+            version '0.3'
 
             from components.java
 

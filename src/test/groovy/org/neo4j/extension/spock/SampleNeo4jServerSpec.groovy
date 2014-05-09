@@ -11,12 +11,15 @@ import spock.lang.Specification
 class SampleNeo4jServerSpec extends Specification {
 
     /**
+     *
      * we need to define our test resources: a neo4j server
      * two options:
+     *
      * <ol>
      *     <li>one server per test class: use @Shared and @ClassRule</li>
      *     <li>one server per test method: use @Rule and optionally @Delegate
      * </ol>
+     *
      * N.B. @Delegate and @Shared cannot be combined!
      */
     @Shared

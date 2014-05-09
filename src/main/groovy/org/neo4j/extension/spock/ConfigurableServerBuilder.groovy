@@ -19,6 +19,10 @@ package org.neo4j.extension.spock
 import groovy.transform.CompileStatic
 import org.neo4j.helpers.Clock
 import org.neo4j.kernel.impl.transaction.xaframework.ForceMode
+import org.neo4j.kernel.impl.util.TestLogging
+import org.neo4j.kernel.logging.ConsoleLogger
+import org.neo4j.kernel.logging.DevNullLoggingService
+import org.neo4j.kernel.logging.Logging
 import org.neo4j.server.CommunityNeoServer
 import org.neo4j.server.configuration.Configurator
 import org.neo4j.server.configuration.PropertyFileConfigurator
@@ -44,6 +48,7 @@ class ConfigurableServerBuilder extends CommunityServerBuilder {
     final Map<String,String> config = [:]
 
     ConfigurableServerBuilder() {
+        super(null)
         // workaround for neo4j:neo4j-1855: use LinkedHashMap for thirdPartyJaxRsPackage in super class
         def f = CommunityServerBuilder.class.getDeclaredField("thirdPartyPackages")
         f.setAccessible(true)
@@ -77,7 +82,7 @@ class ConfigurableServerBuilder extends CommunityServerBuilder {
 
         if ( preflightTasks == null )
         {
-            preflightTasks = new PreFlightTasks(null) {
+            preflightTasks = new PreFlightTasks(new TestLogging(), null) {
                 @Override
                 public boolean run()
                 {
@@ -86,40 +91,13 @@ class ConfigurableServerBuilder extends CommunityServerBuilder {
             };
         }
 
-        return new ConfigurableTestCommunityNeoServer( new FixedPropertyFileConfigurator( new Validator(
-                new DatabaseLocationMustBeSpecifiedRule() ), configFile ), configFile, config );
-    }
-
-    /**
-     * subclassed version to fix neo4j:neo4j-1855
-     */
-    @CompileStatic
-    private class FixedPropertyFileConfigurator extends PropertyFileConfigurator {
-
-        FixedPropertyFileConfigurator(Validator v, File propertiesFile) {
-            super(v, propertiesFile)
-        }
-
-        @Override
-        Set<ThirdPartyJaxRsPackage> getThirdpartyJaxRsPackages() {
-            Set<ThirdPartyJaxRsPackage> thirdPartyPackages = new LinkedHashSet<>();
-            List<String> packagesAndMountpoints = this.configuration().getList( THIRD_PARTY_PACKAGES_KEY );
-
-            for ( String packageAndMoutpoint : packagesAndMountpoints )
-            {
-                String[] parts = packageAndMoutpoint.split( "=" );
-                if ( parts.length != 2 )
-                {
-                    throw new IllegalArgumentException( "config for " + THIRD_PARTY_PACKAGES_KEY + " is wrong: " +
-                            packageAndMoutpoint );
-                }
-                String pkg = parts[0];
-                String mountPoint = parts[1];
-
-                thirdPartyPackages.add( new ThirdPartyJaxRsPackage( pkg, mountPoint ) );
-            }
-            return thirdPartyPackages;
-        }
+        return new ConfigurableTestCommunityNeoServer(
+                new PropertyFileConfigurator(
+                        new Validator(new DatabaseLocationMustBeSpecifiedRule() ), configFile, ConsoleLogger.DEV_NULL ),
+                new DevNullLoggingService(),
+//                new TestLogging(),
+                configFile,
+                config );
     }
 
     /** copied from CommunityServerBuilder
@@ -130,8 +108,8 @@ class ConfigurableServerBuilder extends CommunityServerBuilder {
         private final File configFile;
         private final Map<String, String> graphDbConfig
 
-        ConfigurableTestCommunityNeoServer(PropertyFileConfigurator propertyFileConfigurator, File configFile, Map<String,String> config) {
-            super(propertyFileConfigurator);
+        ConfigurableTestCommunityNeoServer(PropertyFileConfigurator propertyFileConfigurator, Logging logging, File configFile, Map<String,String> config) {
+            super(propertyFileConfigurator, logging);
 
             this.configFile = configFile;
             this.graphDbConfig = config
