@@ -12,7 +12,7 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "2.0.3"
+    neo4jVersion = "2.1.2"
     jerseyVersion = "1.9"
 }
 
@@ -42,7 +42,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.3'
+            version '0.4'
 
             from components.java
 

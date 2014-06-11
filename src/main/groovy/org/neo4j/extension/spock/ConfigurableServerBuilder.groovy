@@ -17,27 +17,18 @@
 package org.neo4j.extension.spock
 
 import groovy.transform.CompileStatic
-import org.neo4j.helpers.Clock
-import org.neo4j.kernel.impl.transaction.xaframework.ForceMode
-import org.neo4j.kernel.impl.util.TestLogging
-import org.neo4j.kernel.logging.ConsoleLogger
-import org.neo4j.kernel.logging.DevNullLoggingService
+import org.neo4j.kernel.GraphDatabaseAPI
+import org.neo4j.kernel.InternalAbstractGraphDatabase
 import org.neo4j.kernel.logging.Logging
 import org.neo4j.server.CommunityNeoServer
 import org.neo4j.server.configuration.Configurator
-import org.neo4j.server.configuration.PropertyFileConfigurator
-import org.neo4j.server.configuration.ThirdPartyJaxRsPackage
-import org.neo4j.server.configuration.validation.DatabaseLocationMustBeSpecifiedRule
-import org.neo4j.server.configuration.validation.Validator
-import org.neo4j.server.database.CommunityDatabase
 import org.neo4j.server.database.Database
-import org.neo4j.server.database.EphemeralDatabase
+import org.neo4j.server.database.LifecycleManagingDatabase
 import org.neo4j.server.helpers.CommunityServerBuilder
 import org.neo4j.server.preflight.PreFlightTasks
-import org.neo4j.server.rest.paging.LeaseManager
-import org.neo4j.server.rest.web.DatabaseActions
+import org.neo4j.test.ImpermanentGraphDatabase
 
-import static org.neo4j.helpers.Clock.SYSTEM_CLOCK
+import static org.neo4j.server.database.LifecycleManagingDatabase.lifecycleManagingDatabase
 
 /**
  * allow to set config properties from neo4j.properties, e.g. execution_guard_enabled
@@ -45,7 +36,7 @@ import static org.neo4j.helpers.Clock.SYSTEM_CLOCK
 @CompileStatic
 class ConfigurableServerBuilder extends CommunityServerBuilder {
 
-    final Map<String,String> config = [:]
+    final Map<String, String> config = [:]
 
     ConfigurableServerBuilder() {
         super(null)
@@ -61,102 +52,39 @@ class ConfigurableServerBuilder extends CommunityServerBuilder {
     }
 
     @Override
-    File createPropertiesFiles() throws IOException {
-        def file = super.createPropertiesFiles()
-        return file
+    protected CommunityNeoServer build(File configFile, Configurator configurator, Logging logging) {
+        Database.Factory databaseFactory = createDatabaseFactory()
+        new ConfigurableCommunityNeoServer(configurator, databaseFactory, logging)
     }
 
-/**
-     * mostly a copy of {@link CommunityServerBuilder#build()} but allowing to tweak graphdb's config by hooking into getDbTuningPropertiesWithServerDefaults
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public CommunityNeoServer build() throws IOException
-    {
-        if ( dbDir == null && persistent )
-        {
-            throw new IllegalStateException( "Must specify path" );
-        }
-        final File configFile = createPropertiesFiles();
+    protected Database.Factory createDatabaseFactory() {
+        return lifecycleManagingDatabase(new LifecycleManagingDatabase.GraphFactory() {
+            @Override
+            GraphDatabaseAPI newGraphDatabase(String storeDir, Map<String, String> params, InternalAbstractGraphDatabase.Dependencies dependencies) {
+                params.put( InternalAbstractGraphDatabase.Configuration.ephemeral.name(), "true" );
+                config.each { String k, String v ->
+                    params.put( k, v)
 
-        if ( preflightTasks == null )
-        {
-            preflightTasks = new PreFlightTasks(new TestLogging(), null) {
-                @Override
-                public boolean run()
-                {
-                    return true;
                 }
-            };
-        }
-
-        return new ConfigurableTestCommunityNeoServer(
-                new PropertyFileConfigurator(
-                        new Validator(new DatabaseLocationMustBeSpecifiedRule() ), configFile, ConsoleLogger.DEV_NULL ),
-                new DevNullLoggingService(),
-//                new TestLogging(),
-                configFile,
-                config );
+                return new ImpermanentGraphDatabase( storeDir, params, dependencies );
+            }
+        })
     }
 
-    /** copied from CommunityServerBuilder
-     * difference is that custom config gets injected into tuning params. As a side effect we can basically inject all parameters from neo4j.properties
-      */
-    @CompileStatic
-    private class ConfigurableTestCommunityNeoServer extends CommunityNeoServer {
-        private final File configFile;
-        private final Map<String, String> graphDbConfig
 
-        ConfigurableTestCommunityNeoServer(PropertyFileConfigurator propertyFileConfigurator, Logging logging, File configFile, Map<String,String> config) {
-            super(propertyFileConfigurator, logging);
+    class ConfigurableCommunityNeoServer extends CommunityNeoServer {
+        final File configFile;
 
+        ConfigurableCommunityNeoServer(Configurator propertyFileConfigurator, Database.Factory databaseFactory, Logging logging) {
+            super(propertyFileConfigurator, databaseFactory, logging);
             this.configFile = configFile;
-            this.graphDbConfig = config
         }
 
         @Override
         protected PreFlightTasks createPreflightTasks() {
-            return preflightTasks;
+            new PreFlightTasks( logging );  // omitting all standard preflight tasks here intentionally
         }
 
-        @Override
-        protected Database createDatabase() {
-            return persistent ?
-                    new CommunityDatabase(configurator) {
-                        @Override
-                        protected Map<String, String> getDbTuningPropertiesWithServerDefaults() {
-                            Map map = super.getDbTuningPropertiesWithServerDefaults()
-                            map.putAll(graphDbConfig)
-                            map
-                        }
-                    } :
-                    new EphemeralDatabase(configurator) {
-                        @Override
-                        protected Map<String, String> getDbTuningPropertiesWithServerDefaults() {
-                            Map map = super.getDbTuningPropertiesWithServerDefaults()
-                            map.putAll(graphDbConfig)
-                            map
-                        }
-                    };
-        }
-
-        @Override
-        protected DatabaseActions createDatabaseActions() {
-            Clock clockToUse = (clock != null) ? clock : SYSTEM_CLOCK;
-
-            return new DatabaseActions(
-                    new LeaseManager(clockToUse),
-                    ForceMode.forced,
-                    configurator.configuration().getBoolean(
-                            Configurator.SCRIPT_SANDBOXING_ENABLED_KEY,
-                            Configurator.DEFAULT_SCRIPT_SANDBOXING_ENABLED as boolean) as boolean, database.getGraph());
-        }
-
-        @Override
-        public void stop() {
-            super.stop();
-            configFile.delete();
-        }
     }
+
 }
