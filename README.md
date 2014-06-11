@@ -23,7 +23,7 @@ In case of Gradle, embed into your project's `build.gradle` the following reposi
     ....
     dependencies {
         ....
-        testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: '0.1'
+        testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: '0.4'
     }
     
 If Maven is used:
@@ -44,7 +44,7 @@ If Maven is used:
     <dependency>
         <groupId>org.neo4j.contrib</groupId>
         <artifactId>neo4j-spock-extension</artifactId>
-        <version>0.1</version>
+        <version>0.4</version>
         <scope>test</scope>
     </dependency>
 
@@ -68,3 +68,12 @@ For unit tests, see [SampleNeo4jSpec](src/test/groovy/org/neo4j/extension/spock/
         "MATCH (n) RETURN n LIMIT {limit}".cypher(limit:10  )
 
 For server tests, see [SampleNeo4jServerSpec](src/test/groovy/org/neo4j/extension/spock/SampleNeo4jServerSpec.groovy).
+
+### version compatibility ###
+
+See the table below to understand which version of neo4j-spock-extension supports which version of Neo4j:
+
+| version | Neo4j versions | 
+|---------|----------------|
+| 0.3     | 2.0.x          |
+| 0.4     | 2.1.x          |    
