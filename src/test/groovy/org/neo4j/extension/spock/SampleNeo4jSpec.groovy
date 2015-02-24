@@ -1,6 +1,7 @@
 package org.neo4j.extension.spock
 
 import org.junit.Rule
+import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.IteratorUtil
 import org.neo4j.tooling.GlobalGraphOperations
@@ -15,6 +16,13 @@ class SampleNeo4jSpec extends Specification {
     @Rule
     @Delegate
     Neo4jResource neo4jResource = new Neo4jResource( config: [execution_guard_enabled: "true"])
+
+    GraphDatabaseService dummy
+
+
+    def setup() {
+        dummy = graphDatabaseService
+    }
 
     def "graphDatabaseService is available"() {
         expect:
@@ -47,6 +55,21 @@ class SampleNeo4jSpec extends Specification {
         notThrown NotInTransactionException
         IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
     }
+
+    @WithNeo4jTransaction(field = "dummy")
+    def "withNeo4jTransaction works with a field parameter"() {
+
+        expect: "empty database"
+        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 0
+
+        when:
+        graphDatabaseService.createNode()
+
+        then:
+        notThrown NotInTransactionException
+        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
+    }
+
 
     def "cypher method applied to String class"() {
         when:

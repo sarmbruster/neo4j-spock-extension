@@ -1,5 +1,6 @@
 package org.neo4j.extension.spock
 
+import org.neo4j.graphdb.GraphDatabaseService
 import org.spockframework.runtime.extension.AbstractAnnotationDrivenExtension
 import org.spockframework.runtime.extension.AbstractMethodInterceptor
 import org.spockframework.runtime.extension.IMethodInvocation
@@ -16,9 +17,27 @@ class Neo4jTransactionExtension extends AbstractAnnotationDrivenExtension<WithNe
         feature.featureMethod.addInterceptor(new AbstractMethodInterceptor() {
             @Override
             void interceptFeatureMethod(IMethodInvocation invocation) throws Throwable {
-                GraphDatabaseServiceProvider value = invocation.instance.properties.values().find { it instanceof GraphDatabaseServiceProvider}
-                assert value, "no Neo4jResource defined in specification ${invocation.instance.class.name}"
-                Neo4jUtils.withSuccessTransaction(value.graphDatabaseService, { invocation.proceed() } )
+
+                GraphDatabaseService graphDatabaseService = null
+
+                def field = annotation.field()
+                if (!field ) {
+
+                    graphDatabaseService = invocation.instance.properties.values().find {
+                        it instanceof GraphDatabaseService
+                    }
+
+                    if (graphDatabaseService == null) {
+                        GraphDatabaseServiceProvider value = invocation.instance.properties.values().find {
+                            it instanceof GraphDatabaseServiceProvider
+                        }
+                        assert value, "no property of type GraphDatabaseService or Neo4jResource is defined in specification ${invocation.instance.class.name}"
+                        graphDatabaseService = value.graphDatabaseService
+                    }
+                } else {
+                    graphDatabaseService = invocation.instance.properties[field]
+                }
+                Neo4jUtils.withSuccessTransaction(graphDatabaseService, { invocation.proceed() } )
             }
         })
     }

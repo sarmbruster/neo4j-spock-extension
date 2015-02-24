@@ -11,5 +11,5 @@ import java.lang.annotation.Target
 @Target([ElementType.TYPE, ElementType.METHOD])
 @ExtensionAnnotation(Neo4jTransactionExtension.class)
 public @interface WithNeo4jTransaction {
-
+    String field() default ""
 }
