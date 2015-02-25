@@ -14,15 +14,12 @@ class Neo4jResource extends ExternalResource implements GraphDatabaseServiceProv
     Map config = [:]
     GraphDatabaseService graphDatabaseService
 
-    @Lazy
-    ExecutionEngine executionEngine = new ExecutionEngine(graphDatabaseService)
-
     @Override
     protected void before() throws Throwable {
         def builder = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder()
         graphDatabaseService =  builder.setConfig(config).newGraphDatabase()
-        String.metaClass.cypher = { -> executionEngine.execute(delegate)}
-        String.metaClass.cypher = { Map params -> executionEngine.execute(delegate, params)}
+        String.metaClass.cypher = { -> graphDatabaseService.execute(delegate)}
+        String.metaClass.cypher = { Map params -> graphDatabaseService.execute(delegate, params)}
     }
 
     @Override

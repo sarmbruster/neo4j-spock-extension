@@ -30,9 +30,10 @@ class SampleNeo4jServerSpec extends Specification {
 
     def "server is running"() {
         expect:
-        neo4j.baseUrl == "http://localhost:${neo4j.port}/"
+        neo4j.baseUrl =~ "http://localhost:\\d+/"
 
         and: "root page gives http 200"
+
         neo4j.http.GET("").status() == 200
     }
 

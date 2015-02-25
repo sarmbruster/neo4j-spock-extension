@@ -1,7 +1,6 @@
-//apply plugin: "java"
 apply plugin: "groovy"
 apply plugin: 'maven-publish'
-apply from: 'gradle/idea/idea.gradle'
+//apply from: 'gradle/idea/idea.gradle'
 
 //sourceCompatibility=JavaVersion.VERSION_1_7
 //targetCompatibility=JavaVersion.VERSION_1_7
@@ -12,8 +11,8 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "2.1.2"
-    jerseyVersion = "1.9"
+    neo4jVersion = "2.2.0-M04"
+    jerseyVersion = "1.18.1"
 }
 
 dependencies {
@@ -26,11 +25,13 @@ dependencies {
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion) {
         exclude group: 'org.neo4j.browser', module:'neo4j-browser'
     }
+    compile group: "org.neo4j.test", name: "neo4j-harness", version: neo4jVersion
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion, classifier: 'tests') {
         exclude group: 'org.neo4j.browser', module:'neo4j-browser'
     }
     compile group: 'com.sun.jersey', name: 'jersey-core', version: jerseyVersion
-    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
+//    compile group: 'com.sun.jersey', name: 'jersey-server', version: jerseyVersion
+//    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
 }
 
 task sourceJar(type: Jar) {
@@ -42,7 +43,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.4'
+            version '0.5'
 
             from components.java
 

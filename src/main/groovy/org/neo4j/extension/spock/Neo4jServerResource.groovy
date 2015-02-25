@@ -1,8 +1,10 @@
 package org.neo4j.extension.spock
 
 import org.junit.rules.ExternalResource
-import org.neo4j.cypher.javacompat.ExecutionEngine
 import org.neo4j.graphdb.GraphDatabaseService
+import org.neo4j.harness.ServerControls
+import org.neo4j.harness.TestServerBuilder
+import org.neo4j.harness.TestServerBuilders
 import org.neo4j.server.NeoServer
 import org.neo4j.test.server.HTTP
 
@@ -12,44 +14,38 @@ import org.neo4j.test.server.HTTP
 class Neo4jServerResource extends ExternalResource implements GraphDatabaseServiceProvider {
 
     GraphDatabaseService graphDatabaseService
+    ServerControls controls
     NeoServer server
-    int port
     def thirdPartyJaxRsPackages = [:]
     def config = [:]
     String baseUrl
-    @Lazy
-    ExecutionEngine executionEngine = new ExecutionEngine(graphDatabaseService)
+    URI baseURI
 
     @Override
     protected void before() throws Throwable {
-        port = findFreePort()
-        def serverBuilder = new ConfigurableServerBuilder()
+
+        TestServerBuilder builder = TestServerBuilders.newInProcessBuilder()
 
         thirdPartyJaxRsPackages.each { packageName, mountPoint ->
-            serverBuilder.withThirdPartyJaxRsPackage(packageName, mountPoint)
+            builder.withExtension(mountPoint, packageName)
         }
         config.each { k, v ->
-            serverBuilder.withConfigProperty(k, v)
+            builder.withConfig(k,v)
         }
 
-        server = serverBuilder.onPort(port).build();
-        server.start()
-        baseUrl = server.baseUri().toASCIIString()
+        controls = builder.newServer()
+
+        baseURI = controls.httpURI()
+        baseUrl = baseURI.toASCIIString()
+        server = controls.server
         graphDatabaseService = server.database.graph
-        String.metaClass.cypher = { -> executionEngine.execute(delegate) }
-        String.metaClass.cypher = { Map params -> executionEngine.execute(delegate, params) }
+        String.metaClass.cypher = { -> graphDatabaseService.execute(delegate) }
+        String.metaClass.cypher = { Map params -> graphDatabaseService.execute(delegate, params) }
     }
 
     @Override
     protected void after() {
-        server.stop()
-    }
-
-    int findFreePort() {
-        ServerSocket server = new ServerSocket(0)
-        int port = server.localPort
-        server.close()
-        port
+        controls.close()
     }
 
     def withTransaction(Closure closure) {

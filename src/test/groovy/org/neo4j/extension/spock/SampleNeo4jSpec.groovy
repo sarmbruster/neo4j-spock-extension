@@ -29,11 +29,6 @@ class SampleNeo4jSpec extends Specification {
         graphDatabaseService != null  // N.B. due to @Delegate, we're accessing neo4jResource.graphDatabaseService
     }
 
-    def "executionEngine is available"() {
-        expect:
-        executionEngine != null
-    }
-
     def "by default a feature method has no transactional context"() {
         when: "trigger a write operation"
         graphDatabaseService.createNode()
