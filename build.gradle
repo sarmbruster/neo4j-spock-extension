@@ -16,11 +16,11 @@ ext {
 }
 
 dependencies {
-    compile group: "org.codehaus.groovy", name: "groovy-all", version: "2.2.1"
+    compile group: "org.codehaus.groovy", name: "groovy-all", version: "2.4.1"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion
     //compile group: 'org.neo4j', name: 'neo4j-lucene-index', version: neo4jVersion
     //compile group: 'org.neo4j', name: 'server-api', version: neo4jVersion
-    compile "org.spockframework:spock-core:0.7-groovy-2.0"
+    compile "org.spockframework:spock-core:1.0-groovy-2.4"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion, classifier: 'tests'
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion) {
         exclude group: 'org.neo4j.browser', module:'neo4j-browser'
@@ -43,7 +43,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.5.1'
+            version '0.5.2'
 
             from components.java
 
