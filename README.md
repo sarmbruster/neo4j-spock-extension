@@ -76,4 +76,6 @@ See the table below to understand which version of neo4j-spock-extension support
 | version | Neo4j versions | 
 |---------|----------------|
 | 0.3     | 2.0.x          |
-| 0.4     | 2.1.x          |    
+| 0.4     | 2.1.x          |
+| 0.5     | 2.2.x          |
+| 0.6     | 2.3.x          |

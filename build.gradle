@@ -11,12 +11,12 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "2.2.0-RC01"
-    jerseyVersion = "1.18.1"
+    neo4jVersion = "2.3.0"
+    jerseyVersion = "1.19"
 }
 
 dependencies {
-    compile group: "org.codehaus.groovy", name: "groovy-all", version: "2.4.1"
+    compile group: "org.codehaus.groovy", name: "groovy", version: "2.4.5"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion
     //compile group: 'org.neo4j', name: 'neo4j-lucene-index', version: neo4jVersion
     //compile group: 'org.neo4j', name: 'server-api', version: neo4jVersion
@@ -43,7 +43,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.5.2'
+            version '0.6.0'
 
             from components.java
 

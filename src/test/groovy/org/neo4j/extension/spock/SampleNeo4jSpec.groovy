@@ -1,6 +1,7 @@
 package org.neo4j.extension.spock
 
 import org.junit.Rule
+import org.neo4j.graphdb.DynamicLabel
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.IteratorUtil
@@ -83,5 +84,52 @@ class SampleNeo4jSpec extends Specification {
 
         then:
         executionResult[0].name == 'Stefan'
+    }
+
+
+    def "check long and int"() {
+        setup:
+        "create (n:Person{value:1357016400000})".cypher()
+        "create (n:Person{value:toInt(1)})".cypher()
+
+        when:
+        Neo4jUtils.withSuccessTransaction(graphDatabaseService) {
+            def n = graphDatabaseService.createNode(DynamicLabel.label("Person"))
+            n.setProperty("value", 1357016400000 as int)
+        }
+        Neo4jUtils.withSuccessTransaction(graphDatabaseService) {
+            for (def n: graphDatabaseService.findNodes(DynamicLabel.label("Person"))) {
+                println "id: ${n.id}, val: ${n.getProperty("value")}, type: ${n.getProperty("value").class}"
+            }
+        }
+
+//        x = graphDatabaseService.execute("")
+        then:
+        true
+
+        when:
+        def result = "match(n:Person) where n.value>1357016300000 return n".cypher()
+
+        then:
+        result.size() == 1
+
+        when:
+        result = "match(n:Person) where n.value>1357016400001 return n".cypher()
+
+        then:
+        result.size() == 0
+
+        when:
+        result = "match(n:Person) where n.value>={v} return n".cypher(v:1357016300000)
+
+        then:
+        result.size() == 1
+
+        when:
+        result = "match(n:Person) where n.value>={v} return n".cypher(v:1357016300000L)
+
+        then:
+        result.size() == 1
+
     }
 }

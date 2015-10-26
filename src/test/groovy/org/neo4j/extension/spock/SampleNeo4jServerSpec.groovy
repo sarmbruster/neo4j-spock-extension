@@ -106,5 +106,4 @@ class SampleNeo4jServerSpec extends Specification {
             Iterables.count(GlobalGraphOperations.at(neo4j.graphDatabaseService).allNodes)
         }
     }
-
 }
