@@ -50,4 +50,18 @@ class ExtensionLoadOrder1Spec extends Specification {
         LifeCycles.lifeCyclesExecutions[-2..-1] == [ LifeCycle1, LifeCycle2]
     }
 
+    def "check if redirects get resolved"() {
+        when:
+        def response = neo4j.http.GET("mount1")
+
+        then: "we don't get a redirect"
+        response.status() != 302
+
+        and:
+        response.status() == 200
+        response.rawContent() == "test"
+
+
+    }
+
 }

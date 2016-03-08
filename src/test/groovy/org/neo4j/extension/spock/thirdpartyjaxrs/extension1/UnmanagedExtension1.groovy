@@ -16,8 +16,14 @@
 
 package org.neo4j.extension.spock.thirdpartyjaxrs.extension1
 
+import javax.ws.rs.GET
 import javax.ws.rs.Path
 
 @Path("/")
 class UnmanagedExtension1 {
+
+    @GET
+    String something() {
+        "test"
+    }
 }

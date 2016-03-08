@@ -15,11 +15,10 @@ class SampleNeo4jSpec extends Specification {
      * provide Neo4j stuff: graphDatabaseService and executionEngine
      */
     @Rule
-    @Delegate
+    @Delegate(interfaces=false)
     Neo4jResource neo4jResource = new Neo4jResource( config: [execution_guard_enabled: "true"])
 
     GraphDatabaseService dummy
-
 
     def setup() {
         dummy = graphDatabaseService
@@ -66,7 +65,6 @@ class SampleNeo4jSpec extends Specification {
         IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
     }
 
-
     def "cypher method applied to String class"() {
         when:
         def executionResult = "create (n) return n".cypher()
@@ -85,7 +83,6 @@ class SampleNeo4jSpec extends Specification {
         then:
         executionResult[0].name == 'Stefan'
     }
-
 
     def "check long and int"() {
         setup:
@@ -130,6 +127,5 @@ class SampleNeo4jSpec extends Specification {
 
         then:
         result.size() == 1
-
     }
 }

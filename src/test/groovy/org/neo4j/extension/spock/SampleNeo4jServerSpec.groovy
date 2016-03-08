@@ -28,12 +28,15 @@ class SampleNeo4jServerSpec extends Specification {
             config: [execution_guard_enabled: "true"]
     )
 
+    def cleanup() {
+        neo4j.closeCypher()  // since we use a class rule here, make sure every test method cleans up separately
+    }
+
     def "server is running"() {
         expect:
         neo4j.baseUrl =~ "http://localhost:\\d+/"
 
         and: "root page gives http 200"
-
         neo4j.http.GET("").status() == 200
     }
 
@@ -73,7 +76,6 @@ class SampleNeo4jServerSpec extends Specification {
         result[0].count instanceof Number
     }
 
-
     def "guard is enabled in this specification"() {
         when:
         neo4j.server.database.graph.dependencyResolver.resolveDependency(Guard)
@@ -82,7 +84,6 @@ class SampleNeo4jServerSpec extends Specification {
         notThrown IllegalArgumentException
     }
 
-
     def "there is no transactional scope by default"() {
         when:
         neo4j.graphDatabaseService.createNode()
@@ -90,7 +91,6 @@ class SampleNeo4jServerSpec extends Specification {
         then:
         thrown NotInTransactionException
     }
-
 
     @WithNeo4jTransaction
     def "withNeo4jTransaction provides transactional scope"() {

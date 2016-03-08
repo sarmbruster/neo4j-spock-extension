@@ -13,7 +13,7 @@ class SampleNeo4jBoltSpec extends Specification {
      * provide Neo4j stuff: graphDatabaseService and executionEngine
      */
     @Rule
-    @Delegate
+    @Delegate(interfaces=false)
     Neo4jBoltResource neo4jResource = new Neo4jBoltResource( )
 
     def "we can access db via bolt"() {
