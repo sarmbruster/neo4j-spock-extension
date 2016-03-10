@@ -24,7 +24,6 @@ class SampleNeo4jBoltSpec extends Specification {
 
         then:
         noExceptionThrown()
-
     }
 
     def "connecting to invalid bolt url result in exception"() {

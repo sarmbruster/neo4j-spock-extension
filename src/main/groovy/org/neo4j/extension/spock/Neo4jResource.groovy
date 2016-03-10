@@ -15,9 +15,14 @@ class Neo4jResource extends ExternalResource implements CypherOnStringTrait {
 
     @Override
     protected void before() throws Throwable {
+        doConfigure()
         def builder = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder()
         graphDatabaseService =  builder.setConfig(config).newGraphDatabase()
         initCypherOnString()
+    }
+
+    protected void doConfigure() {
+        // intentionally empty - to be overriden in subclasses
     }
 
     @Override
