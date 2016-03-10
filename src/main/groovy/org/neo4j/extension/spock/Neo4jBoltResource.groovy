@@ -1,8 +1,10 @@
 package org.neo4j.extension.spock
 
+import org.neo4j.driver.v1.Driver
+import org.neo4j.driver.v1.GraphDatabase
+import org.neo4j.driver.v1.Session
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.harness.internal.Ports
-import org.neo4j.test.TestGraphDatabaseFactory
 
 /**
  * a junit external resource implementation for providing a {@link GraphDatabaseService} with a bolt configuration
@@ -11,6 +13,15 @@ import org.neo4j.test.TestGraphDatabaseFactory
 class Neo4jBoltResource extends Neo4jResource {
 
     String boltUrl
+    Driver driver
+    Session session
+
+    @Override
+    protected void before() throws Throwable {
+        super.before()
+        driver = GraphDatabase.driver(boltUrl)
+        session = driver.session()
+    }
 
     @Override
     protected void doConfigure() {
@@ -23,4 +34,10 @@ class Neo4jBoltResource extends Neo4jResource {
         config["dbms.connector.0.address"] = url.toString()
     }
 
+    @Override
+    protected void after() {
+        session.close()
+        driver.close()
+        super.after()
+    }
 }

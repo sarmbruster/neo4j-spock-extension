@@ -34,7 +34,7 @@ dependencies {
 //    compile group: 'com.sun.jersey', name: 'jersey-server', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
 
-    testCompile "org.neo4j.driver:neo4j-java-driver:$neo4jClientVersion"
+    compile "org.neo4j.driver:neo4j-java-driver:$neo4jClientVersion"
 
 }
 
@@ -47,7 +47,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.7.1'
+            version '0.7.2'
 
             from components.java
 

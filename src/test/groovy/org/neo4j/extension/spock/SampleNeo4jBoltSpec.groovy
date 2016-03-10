@@ -17,9 +17,7 @@ class SampleNeo4jBoltSpec extends Specification {
     Neo4jBoltResource neo4jResource = new Neo4jBoltResource( )
 
     def "we can access db via bolt"() {
-        when:
-        Driver driver = GraphDatabase.driver( boltUrl );
-        Session session = driver.session();
+        when: "using provided session from Neo4jBoltResource"
         session.run("CREATE (n) RETURN n");
 
         then:
