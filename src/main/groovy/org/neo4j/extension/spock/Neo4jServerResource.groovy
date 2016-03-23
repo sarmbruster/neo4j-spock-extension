@@ -26,6 +26,7 @@ class Neo4jServerResource extends ExternalResource implements CypherOnStringTrai
     def config = [:]
     String baseUrl
     URI baseURI
+    boolean shouldAutoRegisterProcedures = true
 
     @Override
     protected void before() throws Throwable {
@@ -46,9 +47,16 @@ class Neo4jServerResource extends ExternalResource implements CypherOnStringTrai
         server = controls.server
         graphDatabaseService = server.database.graph
 
-        initCypherOnString()
+        if (shouldAutoRegisterProcedures) {
+            Neo4jUtils.registerLocalClassesWithProcedureAnnotation(graphDatabaseService)
+        }
 
-        // change a private static final (see http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection)
+        initCypherOnString()
+        fixFollowRedirectsInHttp()
+    }
+
+    public void fixFollowRedirectsInHttp() {
+// change a private static final (see http://stackoverflow.com/questions/3301635/change-private-static-final-field-using-java-reflection)
         Field field = HTTP.class.getDeclaredField("CLIENT")
 
         Field modifiersField = Field.class.getDeclaredField("modifiers")
@@ -57,8 +65,8 @@ class Neo4jServerResource extends ExternalResource implements CypherOnStringTrai
         field.setAccessible(true)
 
         DefaultClientConfig defaultClientConfig = new DefaultClientConfig();
-        defaultClientConfig.getProperties().put( ClientConfig.PROPERTY_FOLLOW_REDIRECTS, Boolean.TRUE);
-        field.set(null, Client.create( defaultClientConfig ))
+        defaultClientConfig.getProperties().put(ClientConfig.PROPERTY_FOLLOW_REDIRECTS, Boolean.TRUE);
+        field.set(null, Client.create(defaultClientConfig))
     }
 
     @Override

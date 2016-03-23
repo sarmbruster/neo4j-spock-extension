@@ -1,5 +1,7 @@
 package org.neo4j.extension.spock
 
+import org.neo4j.graphdb.NotInTransactionException
+
 /**
  * provide `cypher()` method on Strings and keep track of results to provide a hook to close them
  * @author Stefan Armbruster
@@ -24,7 +26,13 @@ trait CypherOnStringTrait implements GraphDatabaseServiceProvider {
     }
 
     public void closeCypher() {
-        cypherResults.each { it.close() }
+        cypherResults.each {
+            try {
+                it.close()
+            } catch (NotInTransactionException e) {
+                // pass - we assume that the cypherresult has already been closed
+            }
+        }
         cypherResults = []
     }
 

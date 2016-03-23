@@ -18,10 +18,14 @@ class SampleNeo4jBoltSpec extends Specification {
 
     def "we can access db via bolt"() {
         when: "using provided session from Neo4jBoltResource"
-        session.run("CREATE (n) RETURN n");
+        def result = session.run("CREATE (n) RETURN count(n) as c");
 
         then:
         noExceptionThrown()
+
+        and:
+        result.single().get("c").asInt() == 1
+        //result.single().c.asInt() == 1
     }
 
     def "connecting to invalid bolt url result in exception"() {

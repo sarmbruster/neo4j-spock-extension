@@ -1,5 +1,6 @@
 package org.neo4j.extension.spock
 
+import org.neo4j.driver.v1.Config
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Session
@@ -19,7 +20,7 @@ class Neo4jBoltResource extends Neo4jResource {
     @Override
     protected void before() throws Throwable {
         super.before()
-        driver = GraphDatabase.driver(boltUrl)
+        driver = GraphDatabase.driver(boltUrl, Config.build().withEncryptionLevel(Config.EncryptionLevel.NONE).toConfig())
         session = driver.session()
     }
 

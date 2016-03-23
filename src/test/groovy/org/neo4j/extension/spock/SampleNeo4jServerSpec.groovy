@@ -4,6 +4,8 @@ import org.junit.ClassRule
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.Iterables
 import org.neo4j.kernel.guard.Guard
+import org.neo4j.kernel.impl.proc.Procedures
+import org.neo4j.kernel.internal.GraphDatabaseAPI
 import org.neo4j.tooling.GlobalGraphOperations
 import spock.lang.Shared
 import spock.lang.Specification
@@ -99,6 +101,16 @@ class SampleNeo4jServerSpec extends Specification {
 
         then:
         notThrown NotInTransactionException
+    }
+
+    def "check if Neo4jServerResource exposes procedures"() {
+        when:
+        def procedures = ((GraphDatabaseAPI)neo4j.graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
+        def nonSystemProcedures = procedures.all.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
+
+        then: "some procedures from this project have been loaded"
+        !nonSystemProcedures.empty
+
     }
 
     private def getNodeCount() {

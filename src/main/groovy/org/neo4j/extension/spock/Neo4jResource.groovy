@@ -12,14 +12,20 @@ class Neo4jResource extends ExternalResource implements CypherOnStringTrait {
 
     Map config = [:]
     GraphDatabaseService graphDatabaseService
+    boolean shouldAutoRegisterProcedures = true
 
     @Override
     protected void before() throws Throwable {
         doConfigure()
         def builder = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder()
         graphDatabaseService =  builder.setConfig(config).newGraphDatabase()
+
+        if (shouldAutoRegisterProcedures) {
+            Neo4jUtils.registerLocalClassesWithProcedureAnnotation(graphDatabaseService)
+        }
         initCypherOnString()
     }
+
 
     protected void doConfigure() {
         // intentionally empty - to be overriden in subclasses
@@ -31,5 +37,7 @@ class Neo4jResource extends ExternalResource implements CypherOnStringTrait {
         Neo4jUtils.assertNoOpenTransaction(graphDatabaseService)
         graphDatabaseService.shutdown()
     }
+
+
 
 }

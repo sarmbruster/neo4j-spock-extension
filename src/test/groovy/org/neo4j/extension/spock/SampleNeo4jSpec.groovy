@@ -1,11 +1,12 @@
 package org.neo4j.extension.spock
 
 import org.junit.Rule
-import org.neo4j.graphdb.DynamicLabel
 import org.neo4j.graphdb.GraphDatabaseService
+import org.neo4j.graphdb.Label
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.IteratorUtil
-import org.neo4j.tooling.GlobalGraphOperations
+import org.neo4j.kernel.impl.proc.Procedures
+import org.neo4j.kernel.internal.GraphDatabaseAPI
 import org.neo4j.graphdb.Node
 import spock.lang.Specification
 
@@ -41,28 +42,28 @@ class SampleNeo4jSpec extends Specification {
     def "withNeo4jTransaction provides transactional"() {
 
         expect: "empty database"
-        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 0
+        IteratorUtil.count(graphDatabaseService.allNodes) == 0
 
         when:
         graphDatabaseService.createNode()
 
         then:
         notThrown NotInTransactionException
-        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
+        IteratorUtil.count(graphDatabaseService.allNodes) == 1
     }
 
     @WithNeo4jTransaction(field = "dummy")
     def "withNeo4jTransaction works with a field parameter"() {
 
         expect: "empty database"
-        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 0
+        IteratorUtil.count(graphDatabaseService.allNodes) == 0
 
         when:
         graphDatabaseService.createNode()
 
         then:
         notThrown NotInTransactionException
-        IteratorUtil.count(GlobalGraphOperations.at(graphDatabaseService).allNodes) == 1
+        IteratorUtil.count(graphDatabaseService.allNodes) == 1
     }
 
     def "cypher method applied to String class"() {
@@ -91,11 +92,11 @@ class SampleNeo4jSpec extends Specification {
 
         when:
         Neo4jUtils.withSuccessTransaction(graphDatabaseService) {
-            def n = graphDatabaseService.createNode(DynamicLabel.label("Person"))
+            def n = graphDatabaseService.createNode(Label.label("Person"))
             n.setProperty("value", 1357016400000 as int)
         }
         Neo4jUtils.withSuccessTransaction(graphDatabaseService) {
-            for (def n: graphDatabaseService.findNodes(DynamicLabel.label("Person"))) {
+            for (def n: graphDatabaseService.findNodes(Label.label("Person"))) {
                 println "id: ${n.id}, val: ${n.getProperty("value")}, type: ${n.getProperty("value").class}"
             }
         }
@@ -127,5 +128,15 @@ class SampleNeo4jSpec extends Specification {
 
         then:
         result.size() == 1
+    }
+
+    def "procedures defined in non-jar parts of classpath are loaded automatically"() {
+        when:
+        def procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
+        def nonSystemProcedures = procedures.all.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
+
+        then: "some procedures from this project have been loaded"
+        !nonSystemProcedures.empty
+
     }
 }

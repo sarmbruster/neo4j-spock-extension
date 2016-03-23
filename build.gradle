@@ -6,21 +6,21 @@ sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
 
 repositories {
+//    mavenLocal()
     mavenCentral()
     maven { url "http://m2.neo4j.org/content/repositories/releases/" }
 }
 
 ext {
     neo4jVersion = "3.0.0-M05"
-    neo4jClientVersion = "1.0.0-M04"
+    neo4jClientVersion = "1.0.0-M05"
+//    neo4jClientVersion = "1.0-SNAPSHOT"
     jerseyVersion = "1.19"
 }
 
 dependencies {
     compile group: "org.codehaus.groovy", name: "groovy", version: "2.4.6"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion
-    //compile group: 'org.neo4j', name: 'neo4j-lucene-index', version: neo4jVersion
-    //compile group: 'org.neo4j', name: 'server-api', version: neo4jVersion
     compile "org.spockframework:spock-core:1.0-groovy-2.4"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion, classifier: 'tests'
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion) {
@@ -33,9 +33,8 @@ dependencies {
     compile group: 'com.sun.jersey', name: 'jersey-core', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-server', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
-
     compile "org.neo4j.driver:neo4j-java-driver:$neo4jClientVersion"
-
+    compile 'org.reflections:reflections:0.9.10'
 }
 
 task sourceJar(type: Jar) {
@@ -47,7 +46,8 @@ publishing {
         maven(MavenPublication) {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
-            version '0.7.2'
+//            version '0.7.4-SNAPSHOT'
+            version '0.7.3'
 
             from components.java
 

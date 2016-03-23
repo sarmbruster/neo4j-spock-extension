@@ -1,8 +1,14 @@
 package org.neo4j.extension.spock
 
 import org.neo4j.graphdb.GraphDatabaseService
+import org.neo4j.kernel.impl.proc.Procedures
 import org.neo4j.kernel.impl.transaction.TransactionCounters
 import org.neo4j.kernel.internal.GraphDatabaseAPI
+import org.neo4j.procedure.Procedure
+import org.reflections.Reflections
+import org.reflections.scanners.MethodAnnotationsScanner
+import org.reflections.util.ConfigurationBuilder
+import org.reflections.util.FilterBuilder
 
 abstract class Neo4jUtils {
 
@@ -38,5 +44,26 @@ abstract class Neo4jUtils {
         }
     }
 
+    static Set<Class> findLocalClassesWithProcedureAnnotation() {
+        def cl = Thread.currentThread().contextClassLoader
+        def nonJarUrls = ((URLClassLoader) cl).getURLs().grep {
+            def url = it.toString()
+            [".jar", ".pom"].every { postfix -> !url.endsWith(postfix)}
+        }
 
+        def reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(nonJarUrls)
+                .setScanners(new MethodAnnotationsScanner())
+                .filterInputsBy(new FilterBuilder().include(".*"))
+        );
+        def resources = reflections.getMethodsAnnotatedWith(Procedure);
+        resources.collect { it.declaringClass } as Set // remove duplicates
+    }
+
+    static void registerLocalClassesWithProcedureAnnotation(GraphDatabaseService graphDatabaseService) {
+        Procedures procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
+        for (Class clazz in findLocalClassesWithProcedureAnnotation()) {
+            procedures.register(clazz)
+        }
+    }
 }
