@@ -4,7 +4,7 @@ import org.junit.Rule
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.graphdb.Label
 import org.neo4j.graphdb.NotInTransactionException
-import org.neo4j.helpers.collection.IteratorUtil
+import org.neo4j.helpers.collection.Iterables
 import org.neo4j.kernel.impl.proc.Procedures
 import org.neo4j.kernel.internal.GraphDatabaseAPI
 import org.neo4j.graphdb.Node
@@ -42,28 +42,28 @@ class SampleNeo4jSpec extends Specification {
     def "withNeo4jTransaction provides transactional"() {
 
         expect: "empty database"
-        IteratorUtil.count(graphDatabaseService.allNodes) == 0
+        Iterables.count(graphDatabaseService.allNodes) == 0
 
         when:
         graphDatabaseService.createNode()
 
         then:
         notThrown NotInTransactionException
-        IteratorUtil.count(graphDatabaseService.allNodes) == 1
+        Iterables.count(graphDatabaseService.allNodes) == 1
     }
 
     @WithNeo4jTransaction(field = "dummy")
     def "withNeo4jTransaction works with a field parameter"() {
 
         expect: "empty database"
-        IteratorUtil.count(graphDatabaseService.allNodes) == 0
+        Iterables.count(graphDatabaseService.allNodes) == 0
 
         when:
         graphDatabaseService.createNode()
 
         then:
         notThrown NotInTransactionException
-        IteratorUtil.count(graphDatabaseService.allNodes) == 1
+        Iterables.count(graphDatabaseService.allNodes) == 1
     }
 
     def "cypher method applied to String class"() {
@@ -101,7 +101,6 @@ class SampleNeo4jSpec extends Specification {
             }
         }
 
-//        x = graphDatabaseService.execute("")
         then:
         true
 

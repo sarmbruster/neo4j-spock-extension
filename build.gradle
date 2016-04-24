@@ -12,8 +12,8 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "3.0.0-M05"
-    neo4jClientVersion = "1.0.0-M05"
+    neo4jVersion = "3.0.0-RC1"
+    neo4jClientVersion = "1.0.0"
 //    neo4jClientVersion = "1.0-SNAPSHOT"
     jerseyVersion = "1.19"
 }
@@ -30,6 +30,7 @@ dependencies {
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion, classifier: 'tests') {
         exclude group: 'org.neo4j.browser', module:'neo4j-browser'
     }
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.20'
     compile group: 'com.sun.jersey', name: 'jersey-core', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-server', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
@@ -47,7 +48,7 @@ publishing {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
 //            version '0.7.4-SNAPSHOT'
-            version '0.7.3'
+            version '0.7.4'
 
             from components.java
 

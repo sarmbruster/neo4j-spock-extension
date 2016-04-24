@@ -3,10 +3,8 @@ package org.neo4j.extension.spock
 import org.junit.ClassRule
 import org.neo4j.graphdb.NotInTransactionException
 import org.neo4j.helpers.collection.Iterables
-import org.neo4j.kernel.guard.Guard
 import org.neo4j.kernel.impl.proc.Procedures
 import org.neo4j.kernel.internal.GraphDatabaseAPI
-import org.neo4j.tooling.GlobalGraphOperations
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -78,14 +76,6 @@ class SampleNeo4jServerSpec extends Specification {
         result[0].count instanceof Number
     }
 
-    def "guard is enabled in this specification"() {
-        when:
-        neo4j.server.database.graph.dependencyResolver.resolveDependency(Guard)
-
-        then:
-        notThrown IllegalArgumentException
-    }
-
     def "there is no transactional scope by default"() {
         when:
         neo4j.graphDatabaseService.createNode()
@@ -115,7 +105,7 @@ class SampleNeo4jServerSpec extends Specification {
 
     private def getNodeCount() {
         neo4j.withTransaction {
-            Iterables.count(GlobalGraphOperations.at(neo4j.graphDatabaseService).allNodes)
+            Iterables.count(neo4j.graphDatabaseService.allNodes)
         }
     }
 }
