@@ -1,6 +1,5 @@
 apply plugin: "groovy"
 apply plugin: 'maven-publish'
-//apply from: 'gradle/idea/idea.gradle'
 
 sourceCompatibility=JavaVersion.VERSION_1_8
 targetCompatibility=JavaVersion.VERSION_1_8
@@ -12,7 +11,7 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "3.0.0-RC1"
+    neo4jVersion = "3.0.0"
     neo4jClientVersion = "1.0.0"
 //    neo4jClientVersion = "1.0-SNAPSHOT"
     jerseyVersion = "1.19"
@@ -30,7 +29,7 @@ dependencies {
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion, classifier: 'tests') {
         exclude group: 'org.neo4j.browser', module:'neo4j-browser'
     }
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.20'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
     compile group: 'com.sun.jersey', name: 'jersey-core', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-server', version: jerseyVersion
 //    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
