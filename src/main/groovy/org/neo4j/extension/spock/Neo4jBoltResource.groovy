@@ -27,8 +27,10 @@ class Neo4jBoltResource extends Neo4jResource {
     @Override
     protected void doConfigure() {
         def iaddress = Ports.findFreePort("localhost", [7687, 20000] as int[])
-        config["dbms.connector.0.enabled"] = "true"
-        config["dbms.connector.0.tls.level"] = "OPTIONAL"
+        config["dbms.connector.bolt.enabled"] = "true"
+        //config["dbms.connector.0.tls.level"] = "OPTIONAL"
+//        config["dbms.connector.0.enabled"] = "true"
+//        config["dbms.connector.0.tls.level"] = "OPTIONAL"
 
         def url = "${iaddress.hostName}:${iaddress.port}"
         boltUrl = "bolt://$url"

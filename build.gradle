@@ -11,8 +11,8 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "3.0.0"
-    neo4jClientVersion = "1.0.0"
+    neo4jVersion = "3.1.0-M13-beta3"
+    neo4jClientVersion = "1.1.0-M06"
 //    neo4jClientVersion = "1.0-SNAPSHOT"
     jerseyVersion = "1.19"
 }
@@ -47,7 +47,7 @@ publishing {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
 //            version '0.7.4-SNAPSHOT'
-            version '0.7.4'
+            version '0.8.0'
 
             from components.java
 

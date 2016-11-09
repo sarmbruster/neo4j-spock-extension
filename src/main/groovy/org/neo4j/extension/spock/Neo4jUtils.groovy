@@ -63,7 +63,8 @@ abstract class Neo4jUtils {
     static void registerLocalClassesWithProcedureAnnotation(GraphDatabaseService graphDatabaseService) {
         Procedures procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
         for (Class clazz in findLocalClassesWithProcedureAnnotation()) {
-            procedures.register(clazz)
+            procedures.registerProcedure(clazz)
+            procedures.registerFunction(clazz)
         }
     }
 }

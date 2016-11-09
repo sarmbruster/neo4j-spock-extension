@@ -132,7 +132,7 @@ class SampleNeo4jSpec extends Specification {
     def "procedures defined in non-jar parts of classpath are loaded automatically"() {
         when:
         def procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
-        def nonSystemProcedures = procedures.all.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
+        def nonSystemProcedures = procedures.allProcedures.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
 
         then: "some procedures from this project have been loaded"
         !nonSystemProcedures.empty

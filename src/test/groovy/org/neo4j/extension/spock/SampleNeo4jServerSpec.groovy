@@ -96,7 +96,7 @@ class SampleNeo4jServerSpec extends Specification {
     def "check if Neo4jServerResource exposes procedures"() {
         when:
         def procedures = ((GraphDatabaseAPI)neo4j.graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
-        def nonSystemProcedures = procedures.all.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
+        def nonSystemProcedures = procedures.allProcedures.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
 
         then: "some procedures from this project have been loaded"
         !nonSystemProcedures.empty
