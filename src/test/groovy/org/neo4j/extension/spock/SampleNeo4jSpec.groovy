@@ -133,9 +133,13 @@ class SampleNeo4jSpec extends Specification {
         when:
         def procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
         def nonSystemProcedures = procedures.allProcedures.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
+        def nonSystemFunctions = procedures.allFunctions.grep { !(it.name().namespace()[0] in ["db" ,"sys"]) }
 
         then: "some procedures from this project have been loaded"
         !nonSystemProcedures.empty
+
+        and: "some functions from this project have been loaded"
+        !nonSystemFunctions.empty
 
     }
 }

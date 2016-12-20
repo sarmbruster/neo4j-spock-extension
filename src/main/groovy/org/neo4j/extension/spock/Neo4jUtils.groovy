@@ -5,10 +5,13 @@ import org.neo4j.kernel.impl.proc.Procedures
 import org.neo4j.kernel.impl.transaction.TransactionCounters
 import org.neo4j.kernel.internal.GraphDatabaseAPI
 import org.neo4j.procedure.Procedure
+import org.neo4j.procedure.UserFunction
 import org.reflections.Reflections
 import org.reflections.scanners.MethodAnnotationsScanner
 import org.reflections.util.ConfigurationBuilder
 import org.reflections.util.FilterBuilder
+
+import java.lang.annotation.Annotation
 
 abstract class Neo4jUtils {
 
@@ -44,7 +47,7 @@ abstract class Neo4jUtils {
         }
     }
 
-    static Set<Class> findLocalClassesWithProcedureAnnotation() {
+    static Set<Class> findLocalClassesWithProcedureAnnotation(Class<? extends Annotation> annotation) {
         def cl = Thread.currentThread().contextClassLoader
         def nonJarUrls = ((URLClassLoader) cl).getURLs().grep {
             def url = it.toString()
@@ -56,14 +59,16 @@ abstract class Neo4jUtils {
                 .setScanners(new MethodAnnotationsScanner())
                 .filterInputsBy(new FilterBuilder().include(".*"))
         );
-        def resources = reflections.getMethodsAnnotatedWith(Procedure);
+        def resources = reflections.getMethodsAnnotatedWith(annotation);
         resources.collect { it.declaringClass } as Set // remove duplicates
     }
 
-    static void registerLocalClassesWithProcedureAnnotation(GraphDatabaseService graphDatabaseService) {
+    static void registerLocalClassesWithProcedureOrUserFunctionAnnotation(GraphDatabaseService graphDatabaseService) {
         Procedures procedures = ((GraphDatabaseAPI)graphDatabaseService).dependencyResolver.resolveDependency(Procedures)
-        for (Class clazz in findLocalClassesWithProcedureAnnotation()) {
+        for (Class clazz in findLocalClassesWithProcedureAnnotation(Procedure)) {
             procedures.registerProcedure(clazz)
+        }
+        for (Class clazz in findLocalClassesWithProcedureAnnotation(UserFunction)) {
             procedures.registerFunction(clazz)
         }
     }

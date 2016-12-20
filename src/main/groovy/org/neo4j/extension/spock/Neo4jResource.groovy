@@ -21,7 +21,7 @@ class Neo4jResource extends ExternalResource implements CypherOnStringTrait {
         graphDatabaseService =  builder.setConfig(config).newGraphDatabase()
 
         if (shouldAutoRegisterProcedures) {
-            Neo4jUtils.registerLocalClassesWithProcedureAnnotation(graphDatabaseService)
+            Neo4jUtils.registerLocalClassesWithProcedureOrUserFunctionAnnotation(graphDatabaseService)
         }
         initCypherOnString()
     }

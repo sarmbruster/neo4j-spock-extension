@@ -4,7 +4,7 @@ import org.junit.Rule
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Session
-import org.neo4j.driver.v1.exceptions.ConnectionFailureException
+import org.neo4j.driver.v1.exceptions.ServiceUnavailableException
 import spock.lang.Specification
 
 class SampleNeo4jBoltSpec extends Specification {
@@ -35,7 +35,7 @@ class SampleNeo4jBoltSpec extends Specification {
         session.run("CREATE (n) RETURN n");
 
         then:
-        def e = thrown(ConnectionFailureException)
+        def e = thrown(ServiceUnavailableException)
         e.message == "Unable to connect to localhost:1234, ensure the database is running and that there is a working network connection to it."
 
     }
