@@ -23,7 +23,7 @@ In case of Gradle, embed into your project's `build.gradle` the following reposi
     ....
     dependencies {
         ....
-        testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: '0.4'
+        testCompile group: 'org.neo4j.contrib', name: 'neo4j-spock-extension', version: theNewestVersionSeeBelow
     }
     
 If Maven is used:
@@ -44,7 +44,7 @@ If Maven is used:
     <dependency>
         <groupId>org.neo4j.contrib</groupId>
         <artifactId>neo4j-spock-extension</artifactId>
-        <version>0.4</version>
+        <version>theNewestVersionSeeBelow</version>
         <scope>test</scope>
     </dependency>
 
@@ -81,3 +81,4 @@ See the table below to understand which version of neo4j-spock-extension support
 | 0.6     | 2.3.x          |
 | 0.7     | 3.0.x          |
 | 0.8     | 3.1.x          |
+| 0.9     | 3.2.x          |
