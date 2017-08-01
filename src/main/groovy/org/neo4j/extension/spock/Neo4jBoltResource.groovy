@@ -1,6 +1,5 @@
 package org.neo4j.extension.spock
 
-import org.neo4j.driver.v1.Config
 import org.neo4j.driver.v1.Driver
 import org.neo4j.driver.v1.GraphDatabase
 import org.neo4j.driver.v1.Session
@@ -20,21 +19,17 @@ class Neo4jBoltResource extends Neo4jResource {
     @Override
     protected void before() throws Throwable {
         super.before()
-        driver = GraphDatabase.driver(boltUrl, Config.build().withEncryptionLevel(Config.EncryptionLevel.NONE).toConfig())
+        driver = GraphDatabase.driver(boltUrl)
         session = driver.session()
     }
 
     @Override
     protected void doConfigure() {
         def iaddress = Ports.findFreePort("localhost", [7687, 20000] as int[])
-        config["dbms.connector.bolt.enabled"] = "true"
-        //config["dbms.connector.0.tls.level"] = "OPTIONAL"
-//        config["dbms.connector.0.enabled"] = "true"
-//        config["dbms.connector.0.tls.level"] = "OPTIONAL"
-
         def url = "${iaddress.hostName}:${iaddress.port}"
         boltUrl = "bolt://$url"
-        config["dbms.connector.0.address"] = url.toString()
+        config["dbms.connector.bolt.enabled"]="true"
+        config["dbms.connector.bolt.listen_address"]=url.toString()
     }
 
     @Override

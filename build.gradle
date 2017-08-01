@@ -11,16 +11,16 @@ repositories {
 }
 
 ext {
-    neo4jVersion = "3.1.0"
-    neo4jClientVersion = "1.1.0"
+    neo4jVersion = "3.2.2"
+    neo4jClientVersion = "1.4.2"
 //    neo4jClientVersion = "1.0-SNAPSHOT"
     jerseyVersion = "1.19"
 }
 
 dependencies {
-    compile group: "org.codehaus.groovy", name: "groovy", version: "2.4.6"
+    compile group: "org.codehaus.groovy", name: "groovy", version: "2.4.12"
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion
-    compile "org.spockframework:spock-core:1.0-groovy-2.4"
+    compile "org.spockframework:spock-core:1.1-groovy-2.4"
     compile group: 'org.neo4j', name: 'neo4j-logging', version: neo4jVersion, classifier: 'tests'
     compile group: 'org.neo4j', name: 'neo4j-kernel', version: neo4jVersion, classifier: 'tests'
     compile(group: 'org.neo4j.app', name: 'neo4j-server', version: neo4jVersion) {
@@ -36,7 +36,7 @@ dependencies {
 //    compile group: 'com.sun.jersey', name: 'jersey-client', version: jerseyVersion
     compile "org.neo4j.driver:neo4j-java-driver:$neo4jClientVersion"
     compile 'org.reflections:reflections:0.9.10'
-    testRuntime 'org.hamcrest:hamcrest-all:1.3'
+    runtime 'org.hamcrest:hamcrest-all:1.3'
 }
 
 task sourceJar(type: Jar) {
@@ -49,7 +49,7 @@ publishing {
             groupId 'org.neo4j.contrib'
             artifactId 'neo4j-spock-extension'
 //            version '0.7.4-SNAPSHOT'
-            version '0.8.2'
+            version '0.9.0'
 
             from components.java
 
